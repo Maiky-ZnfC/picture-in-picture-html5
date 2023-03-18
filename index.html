@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Video Player</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//var success = function(width, height);
+		function getVideoDimensionsOf(url, success){
+			(new Promise(function(resolve){
+				// create the video element
+				var video = document.createElement('video');
+
+				// place a listener on it
+				video.addEventListener('loadedmetadata', function() {
+					// retrieve dimensions
+					var height = this.videoHeight;
+					var width = this.videoWidth;
+					// send back result
+					resolve({
+						width : width
+						height : height,
+					});
+				}, false);
+
+				// start download meta-datas
+				video.src = url;
+			})).then(success);
+		}
+	</script>
+<!--
+	<canvas id="canvas"></canvas>
+
+	<button id="pipButton"></button>
+	
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas');
+		canvas.getContext('2d').fillRect(0, 0, canvas.width, canvas.height);
+		// Draw something to canvas
+
+		var video = document.createElement('video');
+		video.muted = true;
+		video.srcObject = canvas.captureStream(60 /* fps */);
+		video.play();
+
+		pipButton.addEventListener('click', function() {
+			video.requestPictureInPicture();
+		});
+	</script>
+-->
+
+	<video id="myVideo" controls="controls">
+		<source src="video/Choices and Menus in DDLC Modding.mp4" type="video/mp4" />
+		<p>Tu navegador no soporta la etiqueta video de HMTL5.</p>
+	</video>
+	<div id="divPip" style="float: right;">
+		<button id="btnPip" style="display: none;" type="button" class="button">Activar Modo PiP</button>
+	</div>
+
+	<script type="text/javascript">
+		if ('pictureInPictureEnabled' in document) {
+			var myVideo = document.querySelector('#myVideo');
+
+			myVideo.addEventListener('loadedmetadata', function(ev) {
+				console.log(this.videoWidth);
+				console.log(this.videoHeight);
+			});
+
+			var btnPip = document.querySelector('#btnPip');
+
+			btnPip.style.display = null;
+
+			btnPip.addEventListener('click', function() {
+				if (document.pictureInPictureElement) {
+					document.exitPictureInPicture().catch(function(err) {
+						console.log('Error al desactivar PiP');
+						console.log(err);
+					});
+				} else {
+					myVideo.requestPictureInPicture().catch(function(err) {
+						console.log('Error al activar PiP');
+						console.log(err);
+					});
+				}
+			});
+
+			myVideo.addEventListener('enterpictureinpicture', function(ev) {
+				ev.pictureInPictureWindow.addEventListener('resize', function() {
+					console.log('Windows Size: ' + ev.pictureInPictureWindow.width + 'x' + ev.pictureInPictureWindow.height);
+				});
+				//console.log(ev);
+				btnPip.textContent = "Desactivar Modo PiP"
+			});
+
+			myVideo.addEventListener('leavepictureinpicture', function(ev) {
+				//console.log(ev);
+				btnPip.textContent = "Activar Modo PiP"
+			});
+
+			var check = null;
+			if ('mediaSession' in navigator) {
+				var skipTime = 10; // Time to skip in seconds
+
+				navigator.mediaSession.setActionHandler('seekforward', function() {
+					audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
+				});
+
+			}
+		} else {
+			console.log('Tu navegador no es compatible con PiP');
+		}
+	</script>
+</body>
+</html>
